@@ -1,144 +1,109 @@
-const { rethrow } = require('./utils');
+const { rethrow, query } = require('./utils');
+const mysql = require('mysql');
 
 /*** GENERAL ***/
 
-function truncate(conn, tableName) {
-    conn.query(
-        'truncate table ?',
-        [tableName],
-        (err, rows) => {
-            rethrow(err);
-            console.log(`Truncated table ${tableName}`);
-        }
-    )
+const conn = mysql.createConnection({
+    user: 'root',
+    password: '',
+    host: 'localhost',
+    database: 'employee_manager_system'
+});
+
+async function _getAllFrom(tableName) {
+    return await query(
+        conn,
+        'select * from ??',
+        [tableName]
+    );
 }
 
 /*** DEPARTMENTS ***/
 
-function addDepartment(conn, name) {
-    conn.query(
+async function addDepartment(name) {
+    return await query(
+        conn,
         'insert into `Departments` set ?',
-        { name },
-        (err, rows) => {
-            rethrow(err);
-            console.log(`Created ${rows.affectedRows} rows in Departments`);
-        }
-    )
+        { name }
+    );
 }
 
-function showAllDepartments(conn) {
-    conn.query(
-        'select * from `Departments`',
-        (err, rows) => {
-            rethrow(err);
-            console.table(rows);
-        }
-    )
+async function getAllDepartments() {
+    return await _getAllFrom('Departments');
 }
 
 /*** ROLES ***/
 
-function addRole(conn, title, salary, departmentId) {
-    conn.query(
+async function addRole(title, salary, departmentId) {
+    return await query(
+        conn,
         'insert into `Roles` set ?',
         {
             title,
             salary,
             department_id: departmentId
-        },
-        (err, rows) => {
-            rethrow(err);
-            console.log(`Created ${rows.affectedRows} rows.`);
-        }
-    )
-}
-
-function showAllRoles(conn) {
-    conn.query(
-        'select * from `Roles`',
-        (err, rows) => {
-            rethrow(err);
-            console.table(rows);
         }
     );
 }
 
-function showRolesForDepartment(conn, department) {
-    conn.query(
+async function getAllRoles() {
+    return await _getAllFrom('Roles');
+}
+
+async function getRolesForDepartment(department) {
+    return await query(
+        conn,
         'select * from `Roles` where `department_id` = (select `id` from `Departments` where `name` = ?)',
-        [department],
-        (err, rows) => {
-            rethrow(err);
-            console.table(rows);
-        }
-    )
+        [department]
+    );
 }
 
 /*** EMPLOYEES ***/
 
-function addEmployee(conn, firstName, lastName, role, managerId) {
+async function addEmployee(firstName, lastName, role, managerId) {
     if (managerId) {
-        conn.query(
+        return await query(
+            conn,
             'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = (select `id` from `Roles` where `title` = ?), `manager_id` = ?',
-            [firstName, lastName, role, managerId],
-            (err, rows) => {
-                rethrow(err);
-                console.log(`Created ${rows.affectedRows} rows in Employees`);
-            }
-        );
-    } else {
-        conn.query(
-            'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = (select `id` from `Roles` where `title` = ?)',
-            [firstName, lastName, role],
-            (err, rows) => {
-                rethrow(err);
-                console.log(`Created ${rows.affectedRows} rows in Employees`);
-            }
+            [firstName, lastName, role, managerId]
         );
     }
-}
 
-function showAllEmployees(conn) {
-    conn.query(
-        'select * from `Employees`',
-        (err, rows) => {
-            rethrow(err);
-            console.table(rows);
-        }
+    return await query(
+        conn,
+        'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = (select `id` from `Roles` where `title` = ?)',
+        [firstName, lastName, role]
     );
 }
 
-function showEmployeesWithRole(conn, role) {
-    conn.query(
+async function getAllEmployees() {
+    return await _getAllFrom('Employees');
+}
+
+async function getEmployeesWithRole(role) {
+    return await query(
+        conn,
         'select * from `Employees` where `role_id` = (select `id` from `Roles` where `title` = ?)',
-        [role],
-        (err, rows) => {
-            rethrow(err);
-            console.table(rows);
-        }
+        [role]
     );
 }
 
-function showEmployeesInDepartment(conn, department) {
-    conn.query(
+async function getEmployeesInDepartment(department) {
+    return await query(
+        conn,
         'select * from `Employees` where `role_id` in (select `id` from `Roles` where `department_id` = (select `id` from `Departments` where `name` = ?))',
-        [department],
-        (err, rows) => {
-            rethrow(err);
-            console.table(rows);
-        }
+        [department]
     )
 }
 
 module.exports = {
-    truncate,
     addDepartment,
-    showAllDepartments,
+    getAllDepartments,
     addRole,
-    showAllRoles,
-    showRolesForDepartment,
+    getAllRoles,
+    getRolesForDepartment,
     addEmployee,
-    showAllEmployees,
-    showEmployeesWithRole,
-    showEmployeesInDepartment
+    getAllEmployees,
+    getEmployeesWithRole,
+    getEmployeesInDepartment
 };

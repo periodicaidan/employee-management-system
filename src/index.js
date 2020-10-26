@@ -1,27 +1,25 @@
 const mysql = require('mysql');
 const queries = require('./queries');
 
-const conn = mysql.createConnection({
-    user: 'root',
-    password: '',
-    host: 'localhost',
-    database: 'employee_manager_system'
-});
+async function seed() {
+    await queries.addDepartment('Sales');
+    await queries.addDepartment('Accounting');
 
-function seed(conn) {
-    queries.addDepartment(conn, 'Sales');
-    queries.addDepartment(conn, 'Accounting');
+    await queries.addRole('Jr. Salesman', 60000.0, 1);
+    await queries.addRole('Sr. Salesman', 80000.0, 1);
+    await queries.addRole('Sales Manager', 100000.0, 1);
 
-    queries.addRole(conn, 'Jr. Salesman', 60000.0, 1);
-    queries.addRole(conn, 'Sr. Salesman', 80000.0, 1);
-    queries.addRole(conn, 'Sales Manager', 100000.0, 1);
+    
+    await queries.addRole('Jr. Accountant', 50000.0, 2);
+    await queries.addRole('Sr. Accountant', 75000.0, 2);
 
-    queries.addRole(conn, 'Jr. Accountant', 50000.0, 2);
-    queries.addRole(conn, 'Sr. Accountant', 75000.0, 2);
-
-    queries.addEmployee(conn, 'Jackson', 'Ronalds', 'Jr. Salesman');
+    await queries.addEmployee('Jackson', 'Ronalds', 'Jr. Salesman');
 }
 
-// seed(conn);
+// seed();
 
-queries.showRolesForDepartment(conn, 'Sales');
+queries.getAllDepartments()
+    .then(console.table);
+
+queries.getRolesForDepartment('Accounting')
+    .then(console.table);

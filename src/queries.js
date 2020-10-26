@@ -74,6 +74,62 @@ function showRolesForDepartment(conn, department) {
     )
 }
 
+/*** EMPLOYEES ***/
+
+function addEmployee(conn, firstName, lastName, role, managerId) {
+    if (managerId) {
+        conn.query(
+            'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = (select `id` from `Roles` where `title` = ?), `manager_id` = ?',
+            [firstName, lastName, role, managerId],
+            (err, rows) => {
+                rethrow(err);
+                console.log(`Created ${rows.affectedRows} rows in Employees`);
+            }
+        );
+    } else {
+        conn.query(
+            'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = (select `id` from `Roles` where `title` = ?)',
+            [firstName, lastName, role],
+            (err, rows) => {
+                rethrow(err);
+                console.log(`Created ${rows.affectedRows} rows in Employees`);
+            }
+        );
+    }
+}
+
+function showAllEmployees(conn) {
+    conn.query(
+        'select * from `Employees`',
+        (err, rows) => {
+            rethrow(err);
+            console.table(rows);
+        }
+    );
+}
+
+function showEmployeesWithRole(conn, role) {
+    conn.query(
+        'select * from `Employees` where `role_id` = (select `id` from `Roles` where `title` = ?)',
+        [role],
+        (err, rows) => {
+            rethrow(err);
+            console.table(rows);
+        }
+    );
+}
+
+function showEmployeesInDepartment(conn, department) {
+    conn.query(
+        'select * from `Employees` where `role_id` in (select `id` from `Roles` where `department_id` = (select `id` from `Departments` where `name` = ?))',
+        [department],
+        (err, rows) => {
+            rethrow(err);
+            console.table(rows);
+        }
+    )
+}
+
 module.exports = {
     truncate,
     addDepartment,
@@ -81,4 +137,8 @@ module.exports = {
     addRole,
     showAllRoles,
     showRolesForDepartment,
+    addEmployee,
+    showAllEmployees,
+    showEmployeesWithRole,
+    showEmployeesInDepartment
 };

@@ -1,5 +1,4 @@
 const mysql = require('mysql');
-const { truncate } = require('./queries');
 const queries = require('./queries');
 
 const conn = mysql.createConnection({
@@ -19,6 +18,8 @@ function seed(conn) {
 
     queries.addRole(conn, 'Jr. Accountant', 50000.0, 2);
     queries.addRole(conn, 'Sr. Accountant', 75000.0, 2);
+
+    queries.addEmployee(conn, 'Jackson', 'Ronalds', 'Jr. Salesman');
 }
 
 // seed(conn);

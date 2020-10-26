@@ -36,8 +36,49 @@ function showAllDepartments(conn) {
     )
 }
 
+/*** ROLES ***/
+
+function addRole(conn, title, salary, departmentId) {
+    conn.query(
+        'insert into `Roles` set ?',
+        {
+            title,
+            salary,
+            department_id: departmentId
+        },
+        (err, rows) => {
+            rethrow(err);
+            console.log(`Created ${rows.affectedRows} rows.`);
+        }
+    )
+}
+
+function showAllRoles(conn) {
+    conn.query(
+        'select * from `Roles`',
+        (err, rows) => {
+            rethrow(err);
+            console.table(rows);
+        }
+    );
+}
+
+function showRolesForDepartment(conn, department) {
+    conn.query(
+        'select * from `Roles` where `department_id` = (select `id` from `Departments` where `name` = ?)',
+        [department],
+        (err, rows) => {
+            rethrow(err);
+            console.table(rows);
+        }
+    )
+}
+
 module.exports = {
     truncate,
     addDepartment,
-    showAllDepartments
-}
+    showAllDepartments,
+    addRole,
+    showAllRoles,
+    showRolesForDepartment,
+};

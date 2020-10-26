@@ -5,7 +5,7 @@ use employee_manager_system;
 
 create table Departments (
     id int auto_increment primary key,
-    `name` varchar(30) not null
+    `name` varchar(30) unique not null
 );
 
 create table Roles (

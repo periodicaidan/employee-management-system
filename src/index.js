@@ -1,4 +1,6 @@
 const mysql = require('mysql');
+const { truncate } = require('./queries');
+const queries = require('./queries');
 
 const conn = mysql.createConnection({
     user: 'root',
@@ -7,13 +9,6 @@ const conn = mysql.createConnection({
     database: 'employee_manager_system'
 });
 
-function showTables(conn) {
-    conn.query('show tables', (err, rows) => {
-        if (err)
-            throw err;
-
-        console.table(rows);
-    });
-}
-
-showTables(conn);
+queries.truncate(conn, 'Departments');
+queries.addDepartment(conn, 'Management');
+queries.showAllDepartments(conn);

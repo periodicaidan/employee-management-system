@@ -11,6 +11,7 @@
   "author": "Aidan T. Manning <periodicaidan@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "inquirer": "^7.3.3",
     "mysql": "^2.18.1"
   }
 }

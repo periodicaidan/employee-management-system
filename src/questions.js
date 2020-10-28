@@ -6,6 +6,7 @@ const actionOptions = [
     'View All Employees by Department',
     'View All Employees by Manager',
     'Add Employee',
+    'Update Employee Role',
     'Remove Employee',
     'View All Roles',
     'View All Roles by Department',
@@ -31,37 +32,32 @@ async function replIndex() {
             break;
 
         case 'Add Employee':
+            await promptAddEmployee();
+            break;
+        
+        case 'Update Employee Role':
             const employees = await queries.getAllEmployees();
             const roles = await queries.getAllRoles();
 
-            const { firstName, lastName, employeeRole, employeeManager, } = await inquirer.prompt([
+            const { chosenEmployee, newRole } = inquirer.prompt([
                 {
-                    name: 'firstName',
-                    message: 'Employee\'s first name:',
-                },
-                {
-                    name: 'lastName',
-                    message: 'Last name:'
+                    type: 'list',
+                    name: 'chosenEmployee',
+                    message: 'Whose role do you want to change?',
+                    choices: employees.map(em => `${em.first_name} ${em.last_name}`),
+                    filter: answer => employees.find(em => `${em.first_name} ${em.last_name}` === answer),
                 },
                 {
                     type: 'list',
-                    name: 'employeeRole',
-                    message: 'Role:',
+                    name: 'newRole',
+                    message: 'New role:',
                     choices: roles.map(role => role.title),
                     filter: answer => roles.find(role => role.title === answer)
-                },
-                {
-                    type: 'list',
-                    name: 'employeeManager',
-                    message: 'Manager:',
-                    choices: [...employees.map(em => `${em.first_name} ${em.last_name}`), 'None'],
-                    filter: answer => employees.find(em => `${em.first_name} ${em.last_name}` === answer)
                 }
             ]);
 
-            await queries.addEmployee(firstName, lastName, employeeRole.id, employeeManager ? employeeManager.id : null)
-                .then(() => console.log(`New employee added: ${firstName} ${lastName}`));
-
+            console.log(chosenEmployee, newRole);
+            
             break;
         
         case 'View All Roles':
@@ -120,6 +116,39 @@ async function replIndex() {
     }
 
     return true;
+}
+
+async function promptAddEmployee() {
+    const employees = await queries.getAllEmployees();
+    const roles = await queries.getAllRoles();
+
+    const { firstName, lastName, employeeRole, employeeManager, } = await inquirer.prompt([
+        {
+            name: 'firstName',
+            message: 'Employee\'s first name:',
+        },
+        {
+            name: 'lastName',
+            message: 'Last name:'
+        },
+        {
+            type: 'list',
+            name: 'employeeRole',
+            message: 'Role:',
+            choices: roles.map(role => role.title),
+            filter: answer => roles.find(role => role.title === answer)
+        },
+        {
+            type: 'list',
+            name: 'employeeManager',
+            message: 'Manager:',
+            choices: [...employees.map(em => `${em.first_name} ${em.last_name}`), 'None'],
+            filter: answer => employees.find(em => `${em.first_name} ${em.last_name}` === answer)
+        }
+    ]);
+
+    await queries.addEmployee(firstName, lastName, employeeRole.id, employeeManager ? employeeManager.id : null)
+        .then(() => console.log(`New employee added: ${firstName} ${lastName}`));
 }
 
 module.exports = {

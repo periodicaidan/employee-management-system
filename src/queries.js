@@ -70,19 +70,11 @@ async function getRolesForDepartment(department) {
 
 /*** EMPLOYEES ***/
 
-async function addEmployee(firstName, lastName, role, managerId) {
-    if (managerId) {
-        return await query(
-            conn,
-            'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = (select `id` from `Roles` where `title` = ?), `manager_id` = ?',
-            [firstName, lastName, role, managerId]
-        );
-    }
-
+async function addEmployee(firstName, lastName, roleId, managerId) {
     return await query(
         conn,
-        'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = (select `id` from `Roles` where `title` = ?)',
-        [firstName, lastName, role]
+        'insert into `Employees` set `first_name` = ?, `last_name` = ?, `role_id` = ?, `manager_id` = ?',
+        [firstName, lastName, roleId, managerId]
     );
 }
 

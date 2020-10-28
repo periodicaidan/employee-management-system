@@ -80,6 +80,18 @@ async function getAllEmployees() {
     return await _getAllFrom('Employees');
 }
 
+async function getAllEmployeesVerbose() {
+    return await query(
+        conn,
+        // blech
+        'select `E`.`id`, `E`.`first_name`, `E`.`last_name`, `R`.`title`, `D`.`name` as `department`, `R`.`salary`, concat(`Mng`.`first_name`, " ", `Mng`.`last_name`) as `manager`' +
+        'from `Employees` as `E`' +
+        'inner join `Roles` as `R` on `E`.`role_id` = `R`.`id`' +
+        'inner join `Departments` as `D` on `R`.`department_id` = `D`.`id`' +
+        'left join `Employees` as `Mng` on `E`.`manager_id` = `Mng`.`id`'
+    );
+}
+
 async function getEmployeesWithRole(role) {
     return await query(
         conn,
@@ -93,7 +105,15 @@ async function getEmployeesInDepartment(department) {
         conn,
         'select * from `Employees` where `role_id` in (select `id` from `Roles` where `department_id` = (select `id` from `Departments` where `name` = ?))',
         [department]
-    )
+    );
+}
+
+async function updateEmployeeRole(employeeId, newRoleId) {
+    return await query(
+        conn,
+        'update `Employees` set `role_id` = ? where `id` = ?',
+        [employeeId, newRoleId]
+    );
 }
 
 module.exports = {
@@ -104,6 +124,7 @@ module.exports = {
     getRolesForDepartment,
     addEmployee,
     getAllEmployees,
+    getAllEmployeesVerbose,
     getEmployeesWithRole,
     getEmployeesInDepartment
 };

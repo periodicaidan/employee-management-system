@@ -3,13 +3,13 @@ const queries = require('./queries');
 
 const actionOptions = [
     'View All Employees',
-    'View All Employees by Department',
-    'View All Employees by Manager',
+    // 'View All Employees by Department',
+    // 'View All Employees by Manager',
     'Add Employee',
     'Update Employee Role',
-    'Remove Employee',
+    // 'Remove Employee',
     'View All Roles',
-    'View All Roles by Department',
+    // 'View All Roles by Department',
     'Add Role',
     'View All Departments',
     'Add Department',

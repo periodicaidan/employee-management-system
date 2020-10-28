@@ -23,9 +23,20 @@ async function replIndex() {
         choices: actionOptions
     });
 
+    // TODO: Replace console.table with something...less half-assed
     switch (action) {
         case 'View All Employees':
             await queries.getAllEmployeesVerbose()
+                .then(console.table);
+            break;
+        
+        case 'View All Roles':
+            await queries.getAllRolesVerbose()
+                .then(console.table);
+            break;
+        
+        case 'View All Departments':
+            await queries.getAllDepartments()
                 .then(console.table);
             break;
         

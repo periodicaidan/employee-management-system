@@ -50,6 +50,16 @@ async function getAllRoles() {
     return await _getAllFrom('Roles');
 }
 
+async function getAllRolesVerbose() {
+    return await query(
+        conn,
+        'select `R`.`id`, `R`.`title`, `R`.`salary`, `D`.`name` as `department`' +
+        'from `Roles` as `R`' +
+        'inner join `Departments` as `D` on `R`.`department_id` = `D`.`id`' +
+        'order by `R`.`id`'
+    );
+}
+
 async function getRolesForDepartment(department) {
     return await query(
         conn,
@@ -83,12 +93,13 @@ async function getAllEmployees() {
 async function getAllEmployeesVerbose() {
     return await query(
         conn,
-        // blech
+        // blegh
         'select `E`.`id`, `E`.`first_name`, `E`.`last_name`, `R`.`title`, `D`.`name` as `department`, `R`.`salary`, concat(`Mng`.`first_name`, " ", `Mng`.`last_name`) as `manager`' +
         'from `Employees` as `E`' +
         'inner join `Roles` as `R` on `E`.`role_id` = `R`.`id`' +
         'inner join `Departments` as `D` on `R`.`department_id` = `D`.`id`' +
-        'left join `Employees` as `Mng` on `E`.`manager_id` = `Mng`.`id`'
+        'left join `Employees` as `Mng` on `E`.`manager_id` = `Mng`.`id`' + 
+        'order by `E`.`id`'
     );
 }
 
@@ -121,6 +132,7 @@ module.exports = {
     getAllDepartments,
     addRole,
     getAllRoles,
+    getAllRolesVerbose,
     getRolesForDepartment,
     addEmployee,
     getAllEmployees,
